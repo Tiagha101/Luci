@@ -5,9 +5,14 @@ var GameState = {
     this.game.stage.backgroundColor = '#ffffff';
     
     this.block = this.game.add.sprite(200, 200, 'block');
-    this.block.anchor.setTo(0.5)
+    this.block.anchor.setTo(0.5);
+    
+    this.game.physics.arcade.enable(this.block);
+    
     this.block.inputEnabled = true;
     this.block.input.pixelPerfectClick = true;
+    
+  
     
     this.block.events.onInputDown.add(function(){
       this.takeDamage();
