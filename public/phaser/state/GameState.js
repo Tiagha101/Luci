@@ -2,30 +2,36 @@ var GameState = {
   
   create(){
 
-    this.game.stage.backgroundColor = '#ffffff';
+    this.game.stage.backgroundColor = '#0052e7';
+
+    //all sprites initiated
+    this.ground = this.game.add.sprite(0, 680, 'ground');
+    this.luci = this.game.add.sprite(200, 200, 'block');
     
-    this.block = this.game.add.sprite(200, 200, 'block');
-    this.block.anchor.setTo(0.5);
+    //physics enabled
+    this.game.physics.arcade.enable([this.luci, this.ground]);
     
-    this.game.physics.arcade.enable(this.block);
+    /* ----- Environments ----- */
     
-    this.block.inputEnabled = true;
-    this.block.input.pixelPerfectClick = true;
+    //ground
+    this.ground.body.immovable = true;
+    this.ground.body.allowGravity = false;
     
-  
+    /* ----- Characters ----- */
     
-    this.block.events.onInputDown.add(function(){
+    //luci
+    this.luci.anchor.setTo(0.5);
+    this.luci.inputEnabled = true;
+    this.luci.input.pixelPerfectClick = true;
+    this.luci.input.enableDrag();
+    this.luci.customParams = { health: 100 };
+    
+    this.luci.events.onInputDown.add(function(){
       this.takeDamage();
-      console.log('Health:', this.block.customParams.health);
-      
-      if(this.block.customParams.health <= 0){
-        this.gameOver();
-      }
+      console.log('Health:', this.luci.customParams.health);
+      if(this.luci.customParams.health <= 0) this.gameOver();
     }, this);
     
-    this.block.input.enableDrag();
-    
-    this.block.customParams = { health: 100 };
   },
   
   update(){
@@ -38,10 +44,10 @@ var GameState = {
   },
   
   takeDamage(){
-    var attacked = this.game.add.tween(this.block.scale);
+    var attacked = this.game.add.tween(this.luci.scale);
     attacked.to({x: '+.1', y: '-.1'});
     attacked.start();
-    this.block.customParams.health -= 10;
+    this.luci.customParams.health -= 10;
   }
   
 }
