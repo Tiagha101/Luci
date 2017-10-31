@@ -7,21 +7,22 @@ var GameState = {
     this.JUMPING_SPEED = 550;
     this.BOULDER_SPEED = 700;
     
-    this.game.world.setBounds(0,0,20000, 2000)
+    this.game.world.setBounds(0,0,10000, 1000)
   },
   
   create(){
     this.game.stage.backgroundColor = '#0052e7';
     
+    var music = this.game.add.audio('song');
+    music.play();
+    
     //parse json level data file
     this.levelData = JSON.parse(this.game.cache.getText('level'));
     
-    //all sprites initiated
+    //sprites initiated
     this.luci = this.game.add.sprite(this.levelData.playerStart.x, this.levelData.playerStart.y, 'luci');
     this.boulder = this.game.add.sprite(-400, -1000, 'boulder');
-//    this.blue = this.game.add.sprite(500, 400, 'blue', 4);
-
-
+    this.goal = this.game.add.sprite(9400, 700, 'goal').scale.setTo(2);
     
    /* ----- Platform Group from level data ----- */
     
@@ -41,13 +42,18 @@ var GameState = {
     this.peasants.enableBody = true;
     
     var peasant;
-    this.levelData.peasantData.forEach(function(element){
-      peasant = this.peasants.create(this.game.world.randomX, element.y, 'blue');
+//    this.levelData.peasantData.forEach(function(element)
+     for(var i = 0; i < 20; i++){
+      peasant = this.peasants.create(this.game.world.randomX, this.game.world.randomY, 'blue');
       peasant.scale.setTo(0.4);
       peasant.tint = Math.random() * 0xc93535;
       peasant.frame = Math.floor(Math.random() * 11);
-    }, this);
+      peasant.animations.add('walking', [ 6, 2, 6, 2], 6, true)
+      peasant.animations.add('hurting', [ 7, 8,], 2, false);
+      this.peasants.add(peasant);
+    }
     
+    console.log('Peasant Group is:', this.peasants);
      //physics enabled
     this.game.physics.arcade.enable([this.luci, this.platforms, this.boulder, this.peasants]);
     
@@ -64,10 +70,8 @@ var GameState = {
     //animations
     this.luci.animations.add('walking', [ 6, 2, 6, 2], 6, true);
     this.luci.animations.add('jumping', [ 3, 2, 10], 5, false);
-    this.luci.animations.add('hurting', [ 7, 8, 7, 8, 7, 8, 7, 8, 7, 8, 7, 8, 7, 8], 6, false);
+    this.luci.animations.add('hurting', [ 7, 8], 2, false);
     
-//    this.peasant.animations.add('walking', [ 6, 2, 6, 2], 6, true)
-//    this.peasant.animations.add('hurting', [ 7, 8, 7, 8, 7, 8, 7, 8, 7, 8, 7, 8, 7, 8], 6, false);
 
 //    this.luci.events.onInputDown.add(function(){
 //      this.takeDamage();
@@ -84,12 +88,19 @@ var GameState = {
     this.boulder.input.enableDrag();
     this.boulder.body.setSize(500, 708, 0, 0);
     
+    /* ----- Goal ------ */
+    this.goal.inputEnabled = true; 
+//    this.goal.physics.arcade.enable(this.goal);
+//    this.goal.body.immovable = true;
+    
   },
   
   update(){
     this.game.physics.arcade.collide(this.luci, this.platforms);//there is an optional callback function
     this.game.physics.arcade.collide(this.boulder, this.platforms);
     this.game.physics.arcade.collide(this.peasants, this.platforms);
+    
+    
     
     if(this.luci.customParams.health <= 0) this.gameOver();
     
@@ -128,9 +139,13 @@ var GameState = {
       
     } 
     
-//    if(this.peasant.body.touching.down){
-//      this.peasant.play('walking');
-//    }
+    
+    this.peasants.forEach(function(peasant){
+      if(peasant.body.touching.down){
+        peasant.body.velocity.x = this.RUNNING_SPEED;
+        peasant.play('walking');
+      }
+    })
     
     this.boulder.body.velocity.x = this.BOULDER_SPEED;
     this.boulder.angle += 25;
@@ -142,7 +157,8 @@ var GameState = {
 //    });
     this.game.physics.arcade.collide(this.luci, this.boulder, this.killPlayer);
     this.game.physics.arcade.collide(this.peasants, this.boulder, this.deadPeasant);
-
+    this.game.physics.arcade.collide(this.luci, this.goal, this.youWon);
+    
   },
   
   gameOver(){
@@ -152,11 +168,19 @@ var GameState = {
     }, this);
   },
   
+  youWon(){
+    console.log('You won!');
+    this.game.state.start('YouWonState');
+  },
+  
   //not used
   
   deadPeasant(boulder, peasant){
-    console.log('Peasant is:', peasant);
-    peasant.alpha = 0;  
+    peasant.play('hurting');
+    game.time.events.add(300, function(){
+      peasant.destroy();  
+    }, this);
+    
   },
   
   killPlayer(player, boulder){

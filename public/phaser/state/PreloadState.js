@@ -24,6 +24,9 @@ var PreloadState = {
     this.game.load.spritesheet('luci', '/public/assets/images/spritesheets/alien.png', 332, 407, 11);
     this.game.load.spritesheet('blue', '/public/assets/images/spritesheets/blue.png', 332, 407, 11);
     this.game.load.text('level', '/public/phaser/data/level.json');
+    this.game.load.image('goal', '/public/assets/images/goal.png');
+    
+    this.game.load.audio('song', '/public/assets/audio/song.mp3')
 
   },
   
