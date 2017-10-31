@@ -19,8 +19,11 @@ var PreloadState = {
     //Assets
     this.game.load.image('logo', '/public/assets/images/logo.png'); //Luci logo from Illustrator font
     this.game.load.image('background', '/public/assets/images/background.png');
-    this.game.load.image('block', '/public/assets/images/block.png');
     this.game.load.image('ground', '/public/assets/images/ground.png');
+    this.game.load.image('boulder', '/public/assets/images/boulder.png');
+    this.game.load.spritesheet('luci', '/public/assets/images/spritesheets/alien.png', 332, 407, 11);
+    this.game.load.spritesheet('blue', '/public/assets/images/spritesheets/blue.png', 332, 407, 11);
+    this.game.load.text('level', '/public/phaser/data/level.json');
 
   },
   
