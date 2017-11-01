@@ -5,7 +5,7 @@ var GameState = {
     this.cursors = this.game.input.keyboard.createCursorKeys();
     this.RUNNING_SPEED = 1000;
     this.JUMPING_SPEED = 550;
-    this.BOULDER_SPEED = 700;
+    this.BOULDER_SPEED = 500;
     
     this.game.world.setBounds(0,0,10000, 1000)
   },
@@ -21,7 +21,7 @@ var GameState = {
     
     //sprites initiated
     this.luci = this.game.add.sprite(this.levelData.playerStart.x, this.levelData.playerStart.y, 'luci');
-    this.boulder = this.game.add.sprite(-400, -1000, 'boulder');
+    this.boulder = this.game.add.sprite(-200, -200, 'boulder');
     this.goal = this.game.add.sprite(9400, 700, 'goal').scale.setTo(2);
     
    /* ----- Platform Group from level data ----- */
@@ -42,8 +42,7 @@ var GameState = {
     this.peasants.enableBody = true;
     
     var peasant;
-//    this.levelData.peasantData.forEach(function(element)
-     for(var i = 0; i < 20; i++){
+    for(var i = 0; i < 20; i++){
       peasant = this.peasants.create(this.game.world.randomX, this.game.world.randomY, 'blue');
       peasant.scale.setTo(0.4);
       peasant.tint = Math.random() * 0xc93535;
@@ -55,7 +54,7 @@ var GameState = {
     
     console.log('Peasant Group is:', this.peasants);
      //physics enabled
-    this.game.physics.arcade.enable([this.luci, this.platforms, this.boulder, this.peasants]);
+    this.game.physics.arcade.enable([this.luci, this.platforms, this.boulder, this.peasants, this.goal]);
     
     /* ----- Characters ----- */
     
@@ -73,9 +72,9 @@ var GameState = {
     this.luci.animations.add('hurting', [ 7, 8], 2, false);
     
 
-//    this.luci.events.onInputDown.add(function(){
-//      this.takeDamage();
-//    }, this);
+    this.luci.events.onInputDown.add(function(){
+      this.youWon();
+    }, this);
     
     //camera
     this.game.camera.follow(this.luci);
@@ -90,8 +89,8 @@ var GameState = {
     
     /* ----- Goal ------ */
     this.goal.inputEnabled = true; 
-//    this.goal.physics.arcade.enable(this.goal);
-//    this.goal.body.immovable = true;
+//    this.goal.input.pixelPerfectClick = true;
+//    this.goal.input.enableDrag();
     
   },
   
@@ -99,8 +98,7 @@ var GameState = {
     this.game.physics.arcade.collide(this.luci, this.platforms);//there is an optional callback function
     this.game.physics.arcade.collide(this.boulder, this.platforms);
     this.game.physics.arcade.collide(this.peasants, this.platforms);
-    
-    
+    this.game.physics.arcade.collide(this.goal, this.platforms);
     
     if(this.luci.customParams.health <= 0) this.gameOver();
     
@@ -136,18 +134,20 @@ var GameState = {
     if(this.cursors.up.isDown ) {
       this.luci.body.velocity.y = -this.JUMPING_SPEED;
       this.luci.play('jumping')
-      
     } 
-    
     
     this.peasants.forEach(function(peasant){
       if(peasant.body.touching.down){
         peasant.body.velocity.x = this.RUNNING_SPEED;
         peasant.play('walking');
       }
-    })
+    });
     
     this.boulder.body.velocity.x = this.BOULDER_SPEED;
+    
+      if(this.boulder.body.touching.down){
+        this.boulder.body.velocity.x = this.BOULDER_SPEED+870;
+      }``
     this.boulder.angle += 25;
     
 //    this.game.physics.arcade.collide(this.luci, this.boulder, function(luci, boulder){
@@ -173,23 +173,15 @@ var GameState = {
     this.game.state.start('YouWonState');
   },
   
-  //not used
-  
   deadPeasant(boulder, peasant){
     peasant.play('hurting');
     game.time.events.add(300, function(){
       peasant.destroy();  
     }, this);
-    
   },
   
   killPlayer(player, boulder){
-//    var attacked = this.game.add.tween(this.luci.scale);
-//    attacked.to({x: '+.1', y: '-.1'});
-//    attacked.start();
-    console.log('You Died');
     game.state.start('GameOverState', true, false, 'You Dead');
-    
   }
   
 }
