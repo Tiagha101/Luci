@@ -30,10 +30,9 @@ var GameState = {
     this.platforms.enableBody = true;
     
     this.levelData.platformData.forEach(function(element){
-      this.platforms.create(element.x, element.y, 'ground')
+      this.platforms.create(element.x, element.y, 'ground');
     }, this);
     
-    //this has to come after the forEach loop in order to work
     this.platforms.setAll('body.immovable', true);
     this.platforms.setAll('body.allowGravity', false);
     
@@ -89,8 +88,6 @@ var GameState = {
     
     /* ----- Goal ------ */
     this.goal.inputEnabled = true; 
-//    this.goal.input.pixelPerfectClick = true;
-//    this.goal.input.enableDrag();
     
   },
   
@@ -130,7 +127,7 @@ var GameState = {
     if(this.cursors.down.isDown) {
       this.luci.frame = 3;
     }
-      //&& this.luci.body.touching.down
+    
     if(this.cursors.up.isDown ) {
       this.luci.body.velocity.y = -this.JUMPING_SPEED;
       this.luci.play('jumping')
@@ -150,15 +147,9 @@ var GameState = {
       }``
     this.boulder.angle += 25;
     
-//    this.game.physics.arcade.collide(this.luci, this.boulder, function(luci, boulder){
-//      console.log(luci.customParams.health)
-//      luci.play('hurting');
-//      luci.customParams.health-=1
-//    });
     this.game.physics.arcade.collide(this.luci, this.boulder, this.killPlayer);
     this.game.physics.arcade.collide(this.peasants, this.boulder, this.deadPeasant);
     this.game.physics.arcade.collide(this.luci, this.goal, this.youWon);
-    
   },
   
   gameOver(){
