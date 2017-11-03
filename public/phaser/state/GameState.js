@@ -142,9 +142,10 @@ var GameState = {
     
     this.boulder.body.velocity.x = this.BOULDER_SPEED;
     
-      if(this.boulder.body.touching.down){
-        this.boulder.body.velocity.x = this.BOULDER_SPEED+870;
-      }``
+    if(this.boulder.body.touching.down){
+      this.boulder.body.velocity.x = this.BOULDER_SPEED+870;
+    };
+    
     this.boulder.angle += 25;
     
     this.game.physics.arcade.collide(this.luci, this.boulder, this.killPlayer);
